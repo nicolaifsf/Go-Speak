@@ -2,6 +2,8 @@ package speech
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -69,4 +71,43 @@ func SendIBMVoice(fileRef string) string {
 	}
 	//fmt.Println(string(body))
 	return string(body)
+}
+
+type IbmSeshJson struct {
+	Recognize       string `json: "recognize"`
+	RecognizeWS     string `json: "recognizeWS"`
+	Observe_result  string `json: "observe_result"`
+	Session_id      string `json: "session_id"`
+	New_session_uri string `json: "new_session_uri"`
+}
+
+/**
+* Gets a session url and sets up an IBMSeshJson
+*
+**/
+func GetSession() IbmSeshJson {
+	url := "stream.watsonplatform.net/speech-to-text/api/v1/sessions"
+	seshUrl := fmt.Sprintf("https://%s:%s@%s", ibmUsername, ibmPassword, url)
+	req, err := http.NewRequest("POST", seshUrl, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bod, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	inString := string(bod)
+	data := []byte(inString)
+	var sesh IbmSeshJson
+	err = json.Unmarshal(data, &sesh)
+	if err != nil {
+		fmt.Println("this err")
+		log.Fatal(err)
+	}
+	return sesh
 }
