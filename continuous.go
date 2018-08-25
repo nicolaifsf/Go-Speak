@@ -15,6 +15,7 @@ func convArgs(strArray []string) string {
 	return res
 }
 
+// ContinuousRecognition starts recording audio and sends the buffer to Wit.ai
 func ContinuousRecognition() {
 	for {
 		start()

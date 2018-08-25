@@ -10,25 +10,18 @@ import (
 
 var witKey string
 
-/** SetWitKey
-*   witKey must be set prior to executing any wit commands
-**/
+// SetWitKey witKey must be set prior to executing any wit commands
 func SetWitKey(key string) string {
 	witKey = key
 	return witKey
 }
 
-/** PrintWitKey
-*   Returns the current wit key if set, otherwise returns nil
-**/
+// PrintWitKey Returns the current wit key if set, otherwise returns nil
 func PrintWitKey() string {
 	return witKey
 }
 
-/** convert
-* converts a message with spaces into one suitable to passing to wit
-**/
-
+// convert converts a message with spaces into one suitable to passing to wit
 func convert(message string) string {
 	arrString := strings.Split(message, " ")
 	var ret string
@@ -38,6 +31,7 @@ func convert(message string) string {
 	return ret
 }
 
+// SendWitMessage sends the given message to wit api
 func SendWitMessage(message string) string {
 	url := "https://api.wit.ai/message?v=20160225&q=" + convert(message)
 	req, _ := http.NewRequest("GET", url, nil)
@@ -48,16 +42,13 @@ func SendWitMessage(message string) string {
 	return string(contents)
 }
 
-/**
-*Sends an audio file to wit.ai, wit key must have been set prior to calling
-*@param filename the full path to the file that is to be sent
-*@return a string with the json data received
-**/
+// SendWitVoice Sends an audio file to wit.ai, wit key must have been set prior to calling
+//  - @param filename the full path to the file that is to be sent
+//  - @return a string with the json data received
 func SendWitVoice(fileRef string) string {
 	audio, err := ioutil.ReadFile(fileRef)
 	if err != nil {
 		log.Fatal("Error reading file:\n%v\n", err)
-
 	}
 
 	reader := bytes.NewReader(audio)
@@ -81,6 +72,8 @@ func SendWitVoice(fileRef string) string {
 	}
 	return string(body)
 }
+
+// SendWitBuff sends an audio buffer to wit.ai
 func SendWitBuff(buffer *bytes.Buffer) string {
 	url := "https://api.wit.ai/speech?v=20141022"
 	client := &http.Client{}
