@@ -57,23 +57,13 @@ func (wh *WitHandler) SendWitVoice(fileRef string) (string, error) {
 	}
 
 	reader := bytes.NewReader(audio)
-
 	url := "https://api.wit.ai/speech?v=20141022"
-	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, reader)
 	if err != nil {
 		return "", err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+wh.witKey)
-	req.Header.Set("Content-Type", "audio/wav")
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := sendRequest(req, wh.witKey)
 	if err != nil {
 		return "", err
 	}
@@ -84,20 +74,12 @@ func (wh *WitHandler) SendWitVoice(fileRef string) (string, error) {
 // SendWitBuff sends an audio buffer to wit.ai
 func (wh *WitHandler) SendWitBuff(buffer *bytes.Buffer) (string, error) {
 	url := "https://api.wit.ai/speech?v=20141022"
-	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, buffer)
 	if err != nil {
 		return "", err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+wh.witKey)
-	req.Header.Set("Content-Type", "audio/wav")
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := sendRequest(req, wh.witKey)
 	if err != nil {
 		return "", err
 	}
@@ -166,4 +148,24 @@ func convert(message string) string {
 	}
 
 	return ret
+}
+
+func sendRequest(req *http.Request, key string) ([]byte, error) {
+	req.Header.Set("Authorization", "Bearer "+key)
+	req.Header.Set("Content-Type", "audio/wav")
+
+	client := &http.Client{}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
