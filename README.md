@@ -7,7 +7,7 @@ package nicolaifsf/go-speak imported as speech implements continuous speech reco
 
 ### Basic Usage
 ```go
-import("github.com/nicolaifsf/go-speak")
+import ("github.com/nicolaifsf/go-speak")
 //example
 speech.GetWitKey() //note that this package is imported as speech
 ```
@@ -29,4 +29,7 @@ func main(){
 }
 ```
 ContinuousRecognition() currently simply prints out the json response from wit.ai call
+
 ## Installation
+  - Run `go get github.com/nicolaifsf/go-speak`
+  - Run `sudo apt-get install sox`
