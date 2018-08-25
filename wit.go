@@ -48,7 +48,7 @@ func SendWitMessage(message string) string {
 func SendWitVoice(fileRef string) string {
 	audio, err := ioutil.ReadFile(fileRef)
 	if err != nil {
-		log.Fatal("Error reading file:\n%v\n", err)
+		log.Fatalf("Error reading file:\n%v\n", err)
 	}
 
 	reader := bytes.NewReader(audio)
@@ -56,20 +56,22 @@ func SendWitVoice(fileRef string) string {
 	url := "https://api.wit.ai/speech?v=20141022"
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, reader)
-
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error creating a new HTTP request: %v", err)
 	}
+
 	req.Header.Set("Authorization", "Bearer "+witKey)
 	req.Header.Set("Content-Type", "audio/wav")
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error sending voice: %v", err)
 	}
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error reading response: %v", err)
 	}
+
 	return string(body)
 }
 
@@ -78,19 +80,20 @@ func SendWitBuff(buffer *bytes.Buffer) string {
 	url := "https://api.wit.ai/speech?v=20141022"
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, buffer)
-
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error Making new HTTP request: %v", err)
 	}
+
 	req.Header.Set("Authorization", "Bearer "+witKey)
 	req.Header.Set("Content-Type", "audio/wav")
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error sending the audio buffer to wit.ai: %v", err)
 	}
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error reading response: %v", err)
 	}
 	return string(body)
 }
