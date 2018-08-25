@@ -3,7 +3,6 @@ package speech
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os/exec"
 )
 
@@ -16,13 +15,17 @@ func convArgs(strArray []string) string {
 }
 
 // ContinuousRecognition starts recording audio and sends the buffer to Wit.ai
-func ContinuousRecognition() {
+func ContinuousRecognition() error {
+	var err error
 	for {
-		start()
+		err = start()
+		if err != nil {
+			return err
+		}
 	}
 }
 
-func start() {
+func start() error {
 	cmd2 := "rec"
 	arg2 := []string{
 		"-t", "wav", "-",
@@ -37,14 +40,20 @@ func start() {
 	cmdExec := exec.Command(cmd2, arg2...)
 	stdout, err := cmdExec.StdoutPipe()
 	if err != nil {
-		log.Fatalf("Error getting StdoutPipe: %v", err)
+		return err
 	}
 
 	err = cmdExec.Start()
 	if err != nil {
-		log.Fatalf("Error executing command %s: %v", cmd2, err)
+		return err
 	}
 
 	buf.ReadFrom(stdout)
-	fmt.Println(SendWitBuff(buf))
+	text, err := SendWitBuff(buf)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(text)
+	return nil
 }
